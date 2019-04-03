@@ -8,8 +8,9 @@ from PIL import Image
 cmap = plt.cm.viridis
 
 def parse_command():
-    model_names = ['resnet18', 'resnet50']
+    model_names = ['resnet18', 'resnet50', 'enc_dec', 'ms_net']
     loss_names = ['l1', 'l2']
+    opt_names = ['sgd', 'adam']
     data_names = ['nyudepthv2', 'kitti']
     from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
     sparsifier_names = [x.name for x in [UniformSampling, SimulatedStereo]]
@@ -56,6 +57,13 @@ def parse_command():
                         help='evaluate model on validation set')
     parser.add_argument('--no-pretrain', dest='pretrained', action='store_false',
                         help='not to use ImageNet pre-trained weights')
+
+	# Added by abdel62@liu.se
+    parser.add_argument('--lr-decay-step', default=5, type=float,
+                        help='Decay learning late ever ? epochs')
+    parser.add_argument('-o', '--optimizer', metavar='OPTIMIZER', default='sgd', choices=opt_names,
+                        help='Optimizer: ' + ' | '.join(opt_names) + ' (default: SGD)')
+
     parser.set_defaults(pretrained=True)
     args = parser.parse_args()
     if args.modality == 'rgb' and args.num_samples != 0:
@@ -77,9 +85,9 @@ def save_checkpoint(state, is_best, epoch, output_directory):
         if os.path.exists(prev_checkpoint_filename):
             os.remove(prev_checkpoint_filename)
 
-def adjust_learning_rate(optimizer, epoch, lr_init):
+def adjust_learning_rate(optimizer, epoch, lr_init, lr_decay_step):
     """Sets the learning rate to the initial LR decayed by 10 every 5 epochs"""
-    lr = lr_init * (0.1 ** (epoch // 5))
+    lr = lr_init * (0.1 ** (epoch // lr_decay_step))
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 

@@ -26,8 +26,12 @@ best_result.set_to_worst()
 def create_data_loaders(args):
     # Data loading code
     print("=> creating data loaders ...")
-    traindir = os.path.join('data', args.data, 'train')
-    valdir = os.path.join('data', args.data, 'val')
+    nyu_path = '/ssd/datasets/nyu-depth-v2/nyudepthv2'
+    traindir = os.path.join(nyu_path, 'train')
+    valdir = os.path.join(nyu_path, 'val')
+
+    #traindir = os.path.join('data', args.data, 'train')
+    #valdir = os.path.join('data', args.data, 'val')
     train_loader = None
     val_loader = None
 
@@ -124,8 +128,11 @@ def main():
             model = ResNet(layers=18, decoder=args.decoder, output_size=train_loader.dataset.output_size,
                 in_channels=in_channels, pretrained=args.pretrained)
         print("=> model created.")
-        optimizer = torch.optim.SGD(model.parameters(), args.lr, \
-            momentum=args.momentum, weight_decay=args.weight_decay)
+        if args.optimizer == 'sgd':
+	        optimizer = torch.optim.SGD(model.parameters(), args.lr, \
+    	        momentum=args.momentum, weight_decay=args.weight_decay)
+        elif args.optimizer == 'adam':
+	        optimizer = torch.optim.Adam(model.parameters(), args.lr)
 
         # model = torch.nn.DataParallel(model).cuda() # for multi-gpu training
         model = model.cuda()
@@ -154,7 +161,7 @@ def main():
             writer.writeheader()
 
     for epoch in range(start_epoch, args.epochs):
-        utils.adjust_learning_rate(optimizer, epoch, args.lr)
+        utils.adjust_learning_rate(optimizer, epoch, args.lr, args.lr_decay_step)
         train(train_loader, model, criterion, optimizer, epoch) # train for one epoch
         result, img_merge = validate(val_loader, model, epoch) # evaluate on validation set
 
