@@ -1,9 +1,9 @@
 NConv-CNN on NYU-Depth-v2
 ============================
 
-This repo is forked from the PyTorch implementation for ["Sparse-to-Dense: Depth Prediction from Sparse Depth Samples and a Single Image"](https://arxiv.org/pdf/1709.07492.pdf) by [Fangchang Ma](http://www.mit.edu/~fcma) and [Sertac Karaman](http://karaman.mit.edu/).
+The repo provides an implementation to train/test our method ["Confidence Propagation through CNNs for Guided Sparse Depth Regression"](https://arxiv.org/abs/1811.01791) on the ["NYU-Depth-v2 dataset"](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html)
 
-The repo was modified to train our method ["Confidence Propagation through CNNs for Guided Sparse Depth Regression"](https://arxiv.org/abs/1811.01791) on the ["NYU-Depth-v2 dataset"](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html)
+This repo is forked from the PyTorch implementation for ["Sparse-to-Dense: Depth Prediction from Sparse Depth Samples and a Single Image"](https://arxiv.org/pdf/1709.07492.pdf) by [Fangchang Ma](http://www.mit.edu/~fcma) and [Sertac Karaman](http://karaman.mit.edu/).
 
 We provide training for both networks `Enc-Dec-Net[EF]` and `MS-Net[LF]` on the RGB-D input of the dataset.
 as they were described in the paper.
