@@ -12,7 +12,6 @@ as they were described in the paper.
 0. [Requirements](#requirements)
 0. [Training](#training)
 0. [Testing](#testing)
-0. [Benchmark](#benchmark)
 0. [Citation](#citation)
 
 ## Requirements
