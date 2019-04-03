@@ -38,7 +38,7 @@ python main.py --help
 
 For instance, run the following command to train the network `Enc-Dec-Net[EF]`, and both RGB and 100 random sparse depth samples as the input to the network.
 ```bash
-python main.py -a guided_enc_dec -m rgbd -s 100 --data nyudepthv2 --lr 0.001 --lr-decay 10
+python main.py -a guided_enc_dec -m rgbd -s 100 --data nyudepthv2 --optimizer adam --lr 0.001 --lr-decay 10
 ```
 
 Training results will be saved under the `results` folder. To resume a previous training, run
@@ -70,10 +70,10 @@ If you use the code or method in your work, please consider citing the original 
 
 And our paper:
 ```
-	@article{eldesokey2018confidence,
-	  title={Confidence Propagation through CNNs for Guided Sparse Depth Regression},
-	  author={Eldesokey, Abdelrahman and Felsberg, Michael and Khan, Fahad Shahbaz},
-	  journal={arXiv preprint arXiv:1811.01791},
-	  year={2018}
-	}
+@article{eldesokey2018confidence,
+  title={Confidence Propagation through CNNs for Guided Sparse Depth Regression},
+  author={Eldesokey, Abdelrahman and Felsberg, Michael and Khan, Fahad Shahbaz},
+  journal={arXiv preprint arXiv:1811.01791},
+  year={2018}
+}
 ```
