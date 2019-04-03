@@ -1,7 +1,7 @@
 NConv-CNN on NYU-Depth-v2
 ============================
 
-This repo is forked from the PyTorch implementation for ["Sparse-to-Dense: Depth Prediction from Sparse Depth Samples and a Single Image"](https://arxiv.org/pdf/1709.07492.pdf) by [Fangchang Ma](http://www.mit.edu/~fcma) and [Sertac Karaman](http://karaman.mit.edu/) at MIT. 
+This repo is forked from the PyTorch implementation for ["Sparse-to-Dense: Depth Prediction from Sparse Depth Samples and a Single Image"](https://arxiv.org/pdf/1709.07492.pdf) by [Fangchang Ma](http://www.mit.edu/~fcma) and [Sertac Karaman](http://karaman.mit.edu/).
 
 The repo was modified to train our method ["Confidence Propagation through CNNs for Guided Sparse Depth Regression"](https://arxiv.org/abs/1811.01791) on the ["NYU-Depth-v2 dataset"](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html)
 
@@ -26,7 +26,6 @@ This code was tested with Python 3 and PyTorch 1.0.
 	```
 - Download the preprocessed [NYU Depth V2](http://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html) dataset in HDF5 formats, and specify the path to the datasets in `create_data_loaders()` in `main.py` The downloading process might take an hour or so. The NYU dataset requires 32G of storage space.
 	```bash
-	mkdir data; cd data
 	wget http://datasets.lids.mit.edu/sparse-to-dense/data/nyudepthv2.tar.gz
 	tar -xvf nyudepthv2.tar.gz && rm -f nyudepthv2.tar.gz	
 	```
