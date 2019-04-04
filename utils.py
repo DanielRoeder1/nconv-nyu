@@ -8,7 +8,7 @@ from PIL import Image
 cmap = plt.cm.viridis
 
 def parse_command():
-    model_names = ['resnet18', 'resnet50', 'enc_dec', 'ms_net']
+    model_names = ['resnet18', 'resnet50', 'guided_enc_dec', 'guided_ms_net']
     loss_names = ['l1', 'l2']
     opt_names = ['sgd', 'adam']
     data_names = ['nyudepthv2', 'kitti']
@@ -93,10 +93,9 @@ def adjust_learning_rate(optimizer, epoch, lr_init, lr_decay_step):
 
 def get_output_directory(args):
     output_directory = os.path.join('results',
-        '{}.sparsifier={}.samples={}.modality={}.arch={}.decoder={}.criterion={}.lr={}.bs={}.pretrained={}'.
-        format(args.data, args.sparsifier, args.num_samples, args.modality, \
-            args.arch, args.decoder, args.criterion, args.lr, args.batch_size, \
-            args.pretrained))
+        '{}.samples={}.modality={}.arch={}.criterion={}.lr={}.bs={}'.
+        format(args.data, args.num_samples, args.modality, \
+            args.arch, args.criterion, args.lr, args.batch_size))
     return output_directory
 
 

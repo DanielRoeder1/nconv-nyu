@@ -14,6 +14,10 @@ from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
 import criteria
 import utils
 
+# Added by abdel62@liu.se
+from guided_enc_dec import CNN as enc_dec_net
+from guided_ms_net import CNN as ms_net
+
 args = utils.parse_command()
 print(args)
 
@@ -119,7 +123,7 @@ def main():
     # create new model
     else:
         train_loader, val_loader = create_data_loaders(args)
-        print("=> creating Model ({}-{}) ...".format(args.arch, args.decoder))
+        print("=> creating Model ({}) ...".format(args.arch))
         in_channels = len(args.modality)
         if args.arch == 'resnet50':
             model = ResNet(layers=50, decoder=args.decoder, output_size=train_loader.dataset.output_size,
@@ -127,6 +131,11 @@ def main():
         elif args.arch == 'resnet18':
             model = ResNet(layers=18, decoder=args.decoder, output_size=train_loader.dataset.output_size,
                 in_channels=in_channels, pretrained=args.pretrained)
+        elif args.arch == 'guided_enc_dec':
+            model = enc_dec_net('SoftPlus')
+        elif args.arch == 'guided_ms_net':
+            model = ms_net('SoftPlus')
+
         print("=> model created.")
         if args.optimizer == 'sgd':
 	        optimizer = torch.optim.SGD(model.parameters(), args.lr, \
