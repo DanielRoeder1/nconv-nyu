@@ -50,21 +50,34 @@ class ORBSampling(DenseToSparse):
         DenseToSparse.__init__(self)
         self.num_samples = num_samples
         self.max_depth = max_depth
-        self.orb_extractor = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.2, fastThreshold= 20, nlevels=8)
+        self.orb_extractor = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.2, fastThreshold= 14, nlevels=8)
+        self.orb_extractor_r = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.1, fastThreshold= 7, nlevels=8)
+        self.uniform_sample = UniformSampling(num_samples // 2, max_depth)
 
     def __repr__(self):
         return "%s{ns=%d,md=%f,dil=%d.%d}" % \
                (self.name, self.num_samples, self.max_depth)
 
     def dense_to_sparse(self, rgb, depth):
-        kp = self.orb_extractor.detect(rgb,None)
-        kp_s = random.sample(kp,self.num_samples)
-        points = np.array([list(kp.pt) for kp in kp_s]).astype(int)
-        rows = points[:,1]
-        cols = points[:,0]
-        mask = np.full(depth.shape, False)
-        mask[rows,cols] = True
+        kp = self.orb_extractor.detect((rgb*255).astype("uint8"),None)
 
+        if len(kp) < self.num_samples:
+          #print(f"Number of kp found: {len(kp)}")
+          kp = self.orb_extractor_r.detect((rgb*255).astype("uint8"),None)
+          #print(f"After: {len(kp)}")
+
+        if len(kp) < self.num_samples:
+            self.uniform_sample.num_samples = self.num_samples - len(kp)
+            mask = self.uniform_sample.dense_to_sparse(rgb,depth)
+        else:
+            mask = np.full(depth.shape, False)
+            
+        for kp in kp_s:
+            mask[int(kp.pt[1]),int(kp.pt[0])] = True
+
+        else:
+          print("!!!!!! USED UNIFORM SAMPLING !!!!!")
+          
         return mask
 
 

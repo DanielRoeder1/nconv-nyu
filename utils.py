@@ -12,8 +12,8 @@ def parse_command():
     loss_names = ['l1', 'l2']
     opt_names = ['sgd', 'adam']
     data_names = ['nyudepthv2', 'kitti']
-    from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
-    sparsifier_names = [x.name for x in [UniformSampling, SimulatedStereo]]
+    from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo, ORBSampling
+    sparsifier_names = [x.name for x in [UniformSampling, SimulatedStereo,ORBSampling]]
     from models import Decoder
     decoder_names = Decoder.names
     from dataloaders.dataloader import MyDataloader
