@@ -10,7 +10,7 @@ cudnn.benchmark = True
 
 from models import ResNet
 from metrics import AverageMeter, Result
-from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo
+from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo, ORBSampling
 import criteria
 import utils
 
@@ -46,6 +46,9 @@ def create_data_loaders(args):
         sparsifier = UniformSampling(num_samples=args.num_samples, max_depth=max_depth)
     elif args.sparsifier == SimulatedStereo.name:
         sparsifier = SimulatedStereo(num_samples=args.num_samples, max_depth=max_depth)
+    elif args.sparsifier == ORBSampling.name:
+        sparsifier = ORBSampling(num_samples=args.num_samples, max_depth=max_depth)
+        
 
     if args.data == 'nyudepthv2':
         from dataloaders.nyu_dataloader import NYUDataset

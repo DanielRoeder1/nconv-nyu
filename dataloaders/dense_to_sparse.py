@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import random
 
 
 def rgb2grayscale(rgb):
@@ -41,6 +42,30 @@ class UniformSampling(DenseToSparse):
         else:
             prob = float(self.num_samples) / n_keep
             return np.bitwise_and(mask_keep, np.random.uniform(0, 1, depth.shape) < prob)
+
+class ORBSampling(DenseToSparse):
+    name = "orb_sampler"
+
+    def __init__(self, num_samples, max_depth=np.inf):
+        DenseToSparse.__init__(self)
+        self.num_samples = num_samples
+        self.max_depth = max_depth
+        self.orb_extractor = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.2, fastThreshold= 20, nlevels=8)
+
+    def __repr__(self):
+        return "%s{ns=%d,md=%f,dil=%d.%d}" % \
+               (self.name, self.num_samples, self.max_depth)
+
+    def dense_to_sparse(self, rgb, depth):
+        kp = self.orb_extractor.detect(rgb,None)
+        kp_s = random.sample(kp,self.num_samples)
+        points = np.array([list(kp.pt) for kp in kp_s]).astype(int)
+        rows = points[:,1]
+        cols = points[:,0]
+        mask = np.full(depth.shape, False)
+        mask[rows,cols] = True
+
+        return mask
 
 
 class SimulatedStereo(DenseToSparse):
