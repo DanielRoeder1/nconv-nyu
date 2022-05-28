@@ -50,8 +50,8 @@ class ORBSampling(DenseToSparse):
         DenseToSparse.__init__(self)
         self.num_samples = num_samples
         self.max_depth = max_depth
-        self.orb_extractor = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.2, fastThreshold= 14, nlevels=8)
-        self.orb_extractor_r = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.1, fastThreshold= 7, nlevels=8)
+        self.orb_extractor = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.2, fastThreshold= 14, nlevels=8, edgeThreshold = 0)
+        self.orb_extractor_r = cv2.ORB_create(nfeatures = 5000, scaleFactor=1.1, fastThreshold= 7, nlevels=8, edgeThreshold = 0)
         self.uniform_sample = UniformSampling(num_samples // 2, max_depth)
 
     def __repr__(self):
@@ -67,9 +67,11 @@ class ORBSampling(DenseToSparse):
           #print(f"After: {len(kp)}")
 
         if len(kp) < self.num_samples:
+            kp_s = kp
             self.uniform_sample.num_samples = self.num_samples - len(kp)
             mask = self.uniform_sample.dense_to_sparse(rgb,depth)
         else:
+            kp_s = random.sample(kp, self.num_samples)
             mask = np.full(depth.shape, False)
             
         for kp in kp_s:
