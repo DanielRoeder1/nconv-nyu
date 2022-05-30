@@ -30,7 +30,7 @@ best_result.set_to_worst()
 def create_data_loaders(args):
     # Data loading code
     print("=> creating data loaders ...")
-    nyu_path = '/ssd/datasets/nyu-depth-v2/nyudepthv2'
+    nyu_path = 'nyudepthv2'
     traindir = os.path.join(nyu_path, 'train')
     valdir = os.path.join(nyu_path, 'val')
 

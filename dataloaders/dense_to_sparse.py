@@ -76,9 +76,6 @@ class ORBSampling(DenseToSparse):
             
         for kp in kp_s:
             mask[int(kp.pt[1]),int(kp.pt[0])] = True
-
-        else:
-          print("!!!!!! USED UNIFORM SAMPLING !!!!!")
           
         return mask
 
