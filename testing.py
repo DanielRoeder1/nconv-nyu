@@ -15,7 +15,8 @@ class arguments:
 
 
 def rmse(groundtruth, pred):
-  return np.sqrt(np.mean((pred-groundtruth)**2))
+  mask = groundtruth > 1e-3
+  return np.sqrt(np.mean((pred[mask]-groundtruth[mask])**2))
 
 
 class AverageMeter(object):
@@ -52,7 +53,7 @@ def run_test():
     sum_loss += loss
 
   
-  print(f"Average loss for testset: {sum_loss/654}")
+  print(f"Average loss for testset: {sum_loss/len(testloader)}")
   print(Avg.avg)
   return Avg.avg
 
