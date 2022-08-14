@@ -1,7 +1,6 @@
 import os
 import time
 import csv
-import numpy as np
 
 import torch
 import torch.backends.cudnn as cudnn
@@ -10,10 +9,9 @@ cudnn.benchmark = True
 
 from models import ResNet
 from metrics import AverageMeter, Result
-from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo, ORBSampling
 import criteria
 import utils
-from utils import creare_data_loaders
+from utils import create_data_loaders
 
 # Added by abdel62@liu.se
 from guided_enc_dec import CNN as enc_dec_net
