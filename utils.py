@@ -82,12 +82,12 @@ def parse_command():
 def create_data_loaders(args):
     # Data loading code
     print("=> creating data loaders ...")
-    nyu_path = 'nyudepthv2'
-    traindir = os.path.join(nyu_path, 'train')
-    valdir = os.path.join(nyu_path, 'val')
+    #nyu_path = 'nyudepthv2'
+    #traindir = os.path.join(nyu_path, 'train')
+    #valdir = os.path.join(nyu_path, 'val')
 
-    #traindir = os.path.join('data', args.data, 'train')
-    #valdir = os.path.join('data', args.data, 'val')
+    traindir = os.path.join(args.data_path, 'train')
+    valdir = os.path.join(args.data_path, 'val')
     train_loader = None
     val_loader = None
 
@@ -102,7 +102,7 @@ def create_data_loaders(args):
         sparsifier = ORBSampling(num_samples=args.num_samples, max_depth=max_depth)
         
 
-    if args.data == 'nyudepthv2':
+    if args.datatype == 'nyudepthv2':
         from dataloaders.nyu_dataloader import NYUDataset
         if not args.evaluate:
             train_dataset = NYUDataset(traindir, type='train',

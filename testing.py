@@ -3,17 +3,22 @@ import torch
 import numpy as np
 import math
 from tqdm import tqdm
+import os
 
 class arguments:
   def __init__(self):
     self.max_depth = -1
     self.num_samples = 500
     self.evaluate = False
-    self.sparsifier = "orb_sampler"
     self.workers = 8
-    self.data = 'nyudepthv2'
     self.batch_size = 8
     self.modality = "rgbd"
+    self.datatype = "nyudepthv2"
+    model = "model_best_orb.pth.tar" #@param ["model_best_orb.pth.tar", "model_best_uniform.pth.tar"]
+    self.chkpt_path = os.path.join("/content/nconv-nyu", model)
+    self.sparsifier = "orb_sampler" #@param ["orb_sampler", "uar"]
+    self.data_path = "/content/nyudepthv2" #@param ["/content/nyudepthv2","/content/tum_h5", "/content/tum2_h5","/content/tum3_h5"]
+    self.test_depth_variet = False #@param ["False", "True"] {type:"raw"}
 
 
 def rmse(groundtruth, pred):
@@ -135,5 +140,5 @@ if __name__ == '__main__':
     loss_test.get("d2").append(loss_dict.get("d2"))
     loss_test.get("d3").append(loss_dict.get("d3"))
 
-print(loss_test)
-print("-")
+  print(loss_test)
+  print("-")
