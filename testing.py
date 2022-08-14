@@ -4,6 +4,8 @@ import numpy as np
 import math
 from tqdm import tqdm
 import os
+import pickle
+from scipy.stats import binned_statistic
 
 class arguments:
   def __init__(self):
@@ -18,7 +20,57 @@ class arguments:
     self.chkpt_path = os.path.join("/content/nconv-nyu", model)
     self.sparsifier = "orb_sampler" #@param ["orb_sampler", "uar"]
     self.data_path = "/content/nyudepthv2" #@param ["/content/nyudepthv2","/content/tum_h5", "/content/tum2_h5","/content/tum3_h5"]
-    self.test_depth_variet = False #@param ["False", "True"] {type:"raw"}
+    self.test_depth_variety = False #@param ["False", "True"] {type:"raw"}
+    self.save_dir = "/content/nconv-nyu/eval_results"
+
+  def get_name(self):
+    if "orb" in self.chkpt_path:
+      model_name = "model_orb"
+    else:
+      model_name = "model_uni"
+    
+    if "orb" in self.sparsifier:
+      sparsifier = "orb"
+    else:
+      sparsifier = "uni"
+    
+    if "nyu" in self.data_path:
+      data = "nyu"
+    else:
+      data = "tum"
+    
+    model_name = f"{model_name}_{sparsifier}_{data}_{self.num_samples}.pickle"
+    model_path = os.path.join(self.save_dir, model_name)
+    return model_path
+
+class DepthAnalyzer():
+  def __init__(self):
+    self.bin_edges = [0,1,2,3,4,5,6,7]
+    self.gt_depth = []
+    self.error = []
+    self.save_dir = "/content/sparse-to-dense.pytorch/eval_results"
+
+  def add_data(self,pred, gt):
+    mask = gt > 1e-3
+    rmse_error = np.absolute(pred[mask] - gt[mask]).flatten()
+    gt_depth = gt[mask].flatten()
+    self.gt_depth = np.append(self.gt_depth, gt_depth)
+    self.error = np.append(self.error, rmse_error)
+
+  def get_results(self, args):
+    bin_means, bin_edges, binnumber = binned_statistic(self.gt_depth, self.error, bins=self.bin_edges)
+    bin_stds, bin_edges, binnumber = binned_statistic(self.gt_depth, self.error, statistic="std",bins=self.bin_edges)
+
+    bin_idx, counts = np.unique(binnumber, return_counts = True)
+    rel_counts = counts / len(self.gt_depth)
+    bin_width = (bin_edges[1] - bin_edges[0])
+    bin_centers = bin_edges[1:] - bin_width/2
+
+    results = {"mean": bin_means, "std": bin_stds, "counts": rel_counts, "center": bin_centers}
+    with open(args.get_name() , 'wb') as handle:
+        pickle.dump(results, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    return bin_means, bin_stds, rel_counts, bin_centers 
 
 
 def rmse(groundtruth, pred):
@@ -90,9 +142,10 @@ def evaluate(output, target):
 
 
 
-def run_test():
+def run_test(net, testloader,args, test_depth = False):
   Avg = AverageMeter()
-  sum_loss = 0
+  d_analyzer = DepthAnalyzer()
+  #sum_loss = 0
   net.eval()
   for batch_idx, (input, target) in enumerate(testloader):
     input, target = input.cuda(), target.cuda()
@@ -105,13 +158,18 @@ def run_test():
     pred = pred.squeeze().cpu().numpy()
     groundtruth = target.squeeze().cpu().numpy()
 
-    loss = rmse(groundtruth, pred)
-    sum_loss += loss
+    if args.test_depth_variety:
+      d_analyzer.add_data(pred, groundtruth)
+    #loss = rmse(groundtruth, pred)
+    #sum_loss += loss
 
-  print(f"Average RMSE for testset: {sum_loss/len(testloader)}")
+  #print(f"Average RMSE for testset: {sum_loss/len(testloader)}")
   #rmse_new = Avg.get_average().get("rmse")
   #print(f"average from dict: {rmse_new}")
-  return Avg.get_average()
+  
+  if args.test_depth_variety:
+    print(d_analyzer.get_results())
+  return Avg.get_average(args)
 
 if __name__ == '__main__':
   args = arguments()
@@ -129,8 +187,9 @@ if __name__ == '__main__':
   loss_test = {"rmse": [], "mae": [], "mse": [], "lg10": [], "absrel": [], "d1": [], "d2": [], "d3": []}
 
   for n_samples in tqdm([500,400,300,200,100,0]):
+    args.num_samples = n_samples
     testloader.dataset.sparsifier.num_samples = n_samples
-    loss_dict = run_test()
+    loss_dict = run_test(net, testloader, args)
     loss_test.get("rmse").append(loss_dict.get("rmse"))
     loss_test.get("mae").append(loss_dict.get("mae"))
     loss_test.get("mse").append(loss_dict.get("mse"))
