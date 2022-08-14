@@ -13,6 +13,7 @@ from metrics import AverageMeter, Result
 from dataloaders.dense_to_sparse import UniformSampling, SimulatedStereo, ORBSampling
 import criteria
 import utils
+from utils import creare_data_loaders
 
 # Added by abdel62@liu.se
 from guided_enc_dec import CNN as enc_dec_net
@@ -26,64 +27,6 @@ fieldnames = ['mse', 'rmse', 'absrel', 'lg10', 'mae',
                 'data_time', 'gpu_time']
 best_result = Result()
 best_result.set_to_worst()
-
-def create_data_loaders(args):
-    # Data loading code
-    print("=> creating data loaders ...")
-    nyu_path = 'nyudepthv2'
-    traindir = os.path.join(nyu_path, 'train')
-    valdir = os.path.join(nyu_path, 'val')
-
-    #traindir = os.path.join('data', args.data, 'train')
-    #valdir = os.path.join('data', args.data, 'val')
-    train_loader = None
-    val_loader = None
-
-    # sparsifier is a class for generating random sparse depth input from the ground truth
-    sparsifier = None
-    max_depth = args.max_depth if args.max_depth >= 0.0 else np.inf
-    if args.sparsifier == UniformSampling.name:
-        sparsifier = UniformSampling(num_samples=args.num_samples, max_depth=max_depth)
-    elif args.sparsifier == SimulatedStereo.name:
-        sparsifier = SimulatedStereo(num_samples=args.num_samples, max_depth=max_depth)
-    elif args.sparsifier == ORBSampling.name:
-        sparsifier = ORBSampling(num_samples=args.num_samples, max_depth=max_depth)
-        
-
-    if args.data == 'nyudepthv2':
-        from dataloaders.nyu_dataloader import NYUDataset
-        if not args.evaluate:
-            train_dataset = NYUDataset(traindir, type='train',
-                modality=args.modality, sparsifier=sparsifier)
-        val_dataset = NYUDataset(valdir, type='val',
-            modality=args.modality, sparsifier=sparsifier)
-
-    elif args.data == 'kitti':
-        from dataloaders.kitti_dataloader import KITTIDataset
-        if not args.evaluate:
-            train_dataset = KITTIDataset(traindir, type='train',
-                modality=args.modality, sparsifier=sparsifier)
-        val_dataset = KITTIDataset(valdir, type='val',
-            modality=args.modality, sparsifier=sparsifier)
-
-    else:
-        raise RuntimeError('Dataset not found.' +
-                           'The dataset must be either of nyudepthv2 or kitti.')
-
-    # set batch size to be 1 for validation
-    val_loader = torch.utils.data.DataLoader(val_dataset,
-        batch_size=1, shuffle=False, num_workers=args.workers, pin_memory=True)
-
-    # put construction of train loader here, for those who are interested in testing only
-    if not args.evaluate:
-        train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_size=args.batch_size, shuffle=True,
-            num_workers=args.workers, pin_memory=True, sampler=None,
-            worker_init_fn=lambda work_id:np.random.seed(work_id))
-            # worker_init_fn ensures different sampling patterns for each data loading thread
-
-    print("=> data loaders created.")
-    return train_loader, val_loader
 
 def main():
     global args, best_result, output_directory, train_csv, test_csv
