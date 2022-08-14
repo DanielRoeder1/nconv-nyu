@@ -1,4 +1,4 @@
-from main import create_data_loaders
+from utils import create_data_loaders
 import torch
 import numpy as np
 import math
